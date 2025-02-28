@@ -1,0 +1,24 @@
+---
+import { getCategories } from '../lib/supabase';
+
+const { data: categories } = await getCategories();
+---
+
+<div class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-800">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">分类</h3>
+  <ul class="space-y-2">
+    {categories?.map((category) => (
+      <li>
+        <a 
+          href={`/categories/${category.slug}`}
+          class="flex items-center justify-between text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
+        >
+          <span>{category.name}</span>
+          <span class="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium px-2 py-1 rounded-full">
+            {category.post_count || 0}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>

@@ -1,0 +1,94 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.svg';
+
+const navItems = [
+  { name: 'Home', url: '/' },
+  { name: 'Blog', url: '/blog' },
+  { name: 'Categories', url: '/categories' },
+  { name: 'About', url: '/about' },
+  { name: 'Contact', url: '/contact' },
+];
+
+const pathname = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur dark:bg-gray-950/80 dark:border-gray-800">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <div class="flex items-center">
+        <a href="/" class="flex items-center space-x-2">
+          <Image src={logo} alt="Logo" width={32} height={32} />
+          <span class="text-xl font-bold text-gray-900 dark:text-white">YourBlog</span>
+        </a>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center space-x-6">
+        {navItems.map(item => (
+          <a 
+            href={item.url} 
+            class={`text-sm font-medium transition-colors ${
+              pathname === item.url || (item.url !== '/' && pathname.startsWith(item.url)) 
+                ? 'text-primary-600 dark:text-primary-400' 
+                : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
+            }`}
+          >
+            {item.name}
+          </a>
+        ))}
+      </nav>
+      
+      <div class="flex items-center space-x-4">
+        <ThemeToggle />
+        
+        <!-- Mobile menu button -->
+        <button 
+          type="button" 
+          class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+          id="mobile-menu-button"
+        >
+          <span class="sr-only">Open main menu</span>
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile Navigation -->
+  <div class="md:hidden hidden" id="mobile-menu">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      {navItems.map(item => (
+        <a 
+          href={item.url} 
+          class={`block px-3 py-2 rounded-md text-base font-medium ${
+            pathname === item.url || (item.url !== '/' && pathname.startsWith(item.url)) 
+              ? 'text-primary-600 bg-gray-50 dark:bg-gray-800 dark:text-primary-400' 
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+          }`}
+        >
+          {item.name}
+        </a>
+      ))}
+    </div>
+  </div>
+</header>
+
+<script>
+  // Mobile menu toggle
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+      const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+      mobileMenuButton.setAttribute('aria-expanded', (!expanded).toString());
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+</script>

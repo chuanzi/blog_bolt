@@ -1,0 +1,113 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+
+// 生成页码数组
+const getPageNumbers = () => {
+  const pageNumbers = [];
+  const maxPagesToShow = 5;
+  
+  if (totalPages <= maxPagesToShow) {
+    // 如果总页数小于等于最大显示页数，显示所有页码
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+  } else {
+    // 否则，显示当前页附近的页码
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = startPage + maxPagesToShow - 1;
+    
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    
+    // 添加省略号
+    if (startPage > 1) {
+      pageNumbers.unshift('...');
+      pageNumbers.unshift(1);
+    }
+    
+    if (endPage < totalPages) {
+      pageNumbers.push('...');
+      pageNumbers.push(totalPages);
+    }
+  }
+  
+  return pageNumbers;
+};
+
+const pageNumbers = getPageNumbers();
+---
+
+<nav aria-label="分页导航" class="flex justify-center my-8">
+  <ul class="flex items-center space-x-1">
+    <!-- 上一页按钮 -->
+    <li>
+      <a
+        href={currentPage > 1 ? `${baseUrl}/${currentPage - 1}` : `${baseUrl}/1`}
+        class={`px-3 py-2 rounded-md ${
+          currentPage === 1
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+        }`}
+        aria-disabled={currentPage === 1}
+        tabindex={currentPage === 1 ? -1 : 0}
+      >
+        <span class="sr-only">上一页</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </a>
+    </li>
+    
+    <!-- 页码 -->
+    {pageNumbers.map((pageNumber) => (
+      <li>
+        {pageNumber === '...' ? (
+          <span class="px-3 py-2 text-gray-500 dark:text-gray-400">...</span>
+        ) : (
+          <a
+            href={`${baseUrl}/${pageNumber}`}
+            class={`px-3 py-2 rounded-md ${
+              currentPage === pageNumber
+                ? 'bg-primary-600 text-white'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+            aria-current={currentPage === pageNumber ? 'page' : undefined}
+          >
+            {pageNumber}
+          </a>
+        )}
+      </li>
+    ))}
+    
+    <!-- 下一页按钮 -->
+    <li>
+      <a
+        href={currentPage < totalPages ? `${baseUrl}/${currentPage + 1}` : `${baseUrl}/${totalPages}`}
+        class={`px-3 py-2 rounded-md ${
+          currentPage === totalPages
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+        }`}
+        aria-disabled={currentPage === totalPages}
+        tabindex={currentPage === totalPages ? -1 : 0}
+      >
+        <span class="sr-only">下一页</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+        </svg>
+      </a>
+    </li>
+  </ul>
+</nav>

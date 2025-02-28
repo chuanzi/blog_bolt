@@ -1,0 +1,26 @@
+---
+import { getTags } from '../lib/supabase';
+
+const { data: tags } = await getTags();
+
+// 根据文章数量计算标签大小
+const getTagSize = (count: number) => {
+  if (count >= 10) return 'text-lg font-medium';
+  if (count >= 5) return 'text-base';
+  return 'text-sm';
+};
+---
+
+<div class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-800">
+  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">标签云</h3>
+  <div class="flex flex-wrap gap-2">
+    {tags?.map((tag) => (
+      <a 
+        href={`/tags/${tag.slug}`}
+        class={`${getTagSize(tag.post_count || 0)} bg-gray-100 dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-300 px-3 py-1 rounded-full transition-colors`}
+      >
+        {tag.name}
+      </a>
+    ))}
+  </div>
+</div>

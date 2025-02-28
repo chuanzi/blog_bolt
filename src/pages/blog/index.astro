@@ -1,0 +1,94 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PostCard from '../../components/PostCard.astro';
+import CategoryList from '../../components/CategoryList.astro';
+import TagCloud from '../../components/TagCloud.astro';
+import SearchBar from '../../components/SearchBar';
+import Pagination from '../../components/Pagination.astro';
+import { getPosts } from '../../lib/supabase';
+
+// 分页参数
+const postsPerPage = 9;
+const page = 1;
+
+// 获取文章
+const { data: posts, error, count } = await getPosts(postsPerPage, (page - 1) * postsPerPage);
+
+// 计算总页数
+const totalPages = count ? Math.ceil(count / postsPerPage) : 1;
+---
+
+<Layout 
+  title="博客文章 | YourBlog"
+  description="浏览所有博客文章，了解最新的技术、编程和生活分享。"
+>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col md:flex-row gap-8">
+      <!-- 主内容区 -->
+      <div class="md:w-2/3">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">博客文章</h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            探索我的最新文章、教程和见解。
+          </p>
+        </div>
+        
+        <!-- 搜索栏 -->
+        <div class="mb-8">
+          <SearchBar client:load />
+        </div>
+        
+        {error && (
+          <div class="bg-red-100 text-red-700 p-4 rounded-md mb-8">
+            加载文章时出错，请稍后再试。
+          </div>
+        )}
+        
+        {posts && posts.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {posts.map(post => (
+              <PostCard post={post} />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-12 text-gray-500 dark:text-gray-400">
+            暂无文章
+          </div>
+        )}
+        
+        <!-- 分页 -->
+        {totalPages > 1 && (
+          <Pagination currentPage={page} totalPages={totalPages} baseUrl="/blog/page" />
+        )}
+      </div>
+      
+      <!-- 侧边栏 -->
+      <div class="md:w-1/3 space-y-8">
+        <CategoryList />
+        <TagCloud />
+        
+        <!-- 订阅区域 -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-800">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">订阅更新</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">
+            订阅我的博客，获取最新文章和更新。
+          </p>
+          <form class="space-y-3">
+            <input 
+              type="email" 
+              placeholder="您的邮箱地址" 
+              class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              required
+            />
+            <button 
+              type="submit" 
+              class="w-full px-4 py-2 bg-primary-600 text-white font-medium rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              订阅
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

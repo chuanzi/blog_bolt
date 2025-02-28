@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import { formatDistance } from 'date-fns';
+
+interface Props {
+  post: {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    image: string;
+    created_at: string;
+    categories: {
+      name: string;
+      slug: string;
+    };
+  };
+}
+
+const { post } = Astro.props;
+const formattedDate = formatDistance(
+  new Date(post.created_at),
+  new Date(),
+  { addSuffix: true }
+);
+---
+
+<article class="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-800 transition-transform hover:translate-y-[-4px]">
+  <a href={`/blog/${post.slug}`} class="block overflow-hidden h-48">
+    <img 
+      src={post.image} 
+      alt={post.title} 
+      class="w-full h-full object-cover transition-transform hover:scale-105"
+    />
+  </a>
+  <div class="p-6">
+    <div class="flex items-center text-sm mb-2">
+      <a 
+        href={`/categories/${post.categories.slug}`} 
+        class="text-primary-600 dark:text-primary-400 hover:underline"
+      >
+        {post.categories.name}
+      </a>
+      <span class="mx-2 text-gray-400">•</span>
+      <time datetime={post.created_at} class="text-gray-500 dark:text-gray-400">
+        {formattedDate}
+      </time>
+    </div>
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+      <a href={`/blog/${post.slug}`} class="hover:text-primary-600 dark:hover:text-primary-400">
+        {post.title}
+      </a>
+    </h3>
+    <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+      {post.excerpt}
+    </p>
+    <a 
+      href={`/blog/${post.slug}`} 
+      class="text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700 dark:hover:text-primary-300 inline-flex items-center"
+    >
+      阅读全文
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+  </div>
+</article>
